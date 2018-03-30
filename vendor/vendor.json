@@ -1,6 +1,13 @@
 {
 	"comment": "",
 	"ignore": "test",
-	"package": [],
+	"package": [
+		{
+			"checksumSHA1": "BKNxj+5CR0xsmYiUsBXRBFk0UqY=",
+			"path": "github.com/micro/go-web",
+			"revision": "9653736ec4fe4adf05d926febf1e0adbe49d7e61",
+			"revisionTime": "2018-03-15T10:07:11Z"
+		}
+	],
 	"rootPath": "srv-db"
 }
