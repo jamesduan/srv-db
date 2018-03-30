@@ -1,0 +1,84 @@
+syntax = "proto3";
+
+package go.micro.srv.db;
+
+service DB {
+	rpc GetUserById(GetUserRequest) returns (GetUserResponse) {}
+	rpc UpdateUser(UpdateUserRequest) returns (UpdateUserResponse) {}
+	rpc DeleteUser(DeleteUserRequest) returns (DeleteUserResponse) {}
+	rpc Stream(StreamingRequest) returns (stream StreamingResponse) {}
+	rpc PingPong(stream Ping) returns (stream Pong) {}
+}
+
+message Message {
+	string say = 1;
+}
+
+message DeleteUserRequest {
+	int64 id = 1;
+}
+
+message DeleteUserResponse {
+	string status = 1;
+	int64 id = 2;
+}
+
+message GetUserRequest {
+	string id = 1;
+}
+
+message GetUserResponse {
+	int64 id = 1;
+	string name = 2;
+	string sex = 3;
+	string address = 4;
+	string email = 5;
+	string portrait_url = 6;
+	int32 create_time = 7;
+	int32 update_time = 8;
+	message Address {
+		int64 id = 1;
+		string shortname = 2;
+		string address = 3;	
+	}
+	message MobilePhone {
+		int64 id =1;
+		string phone_number =2;
+		string shortname = 3;
+	}
+}
+
+message UpdateUserRequest {
+	int64 id = 1;
+}
+
+message UpdateUserResponse {
+	int64 id = 1;
+	string name = 2;
+	string sex = 3;
+	string address = 4;
+	string email = 5;
+	string portrait_url = 6;
+	int32 create_time = 7;
+	int32 update_time = 8;
+}
+
+message Response {
+	string msg = 1;
+}
+
+message StreamingRequest {
+	int64 count = 1;
+}
+
+message StreamingResponse {
+	int64 count = 1;
+}
+
+message Ping {
+	int64 stroke = 1;
+}
+
+message Pong {
+	int64 stroke = 1;
+}

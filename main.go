@@ -29,7 +29,7 @@ func runClient(service micro.Service) error {
 
 func main() {
 	service := micro.NewService(
-		micro.Name("JamesGreeter"),
+		micro.Name("dbservice"),
 		micro.Version("1.0.1"),
 		micro.Flags(cli.BoolFlag{
 			Name:  "run-client",
