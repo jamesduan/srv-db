@@ -1,35 +1,40 @@
 package main
 
 import (
+	"context"
 	"log"
 	"os"
+	"srv-db/handler"
+	proto "srv-db/proto/db"
+
+	"srv-db/db"
 
 	"github.com/micro/cli"
-	proto "github.com/micro/examples/service/proto"
 	"github.com/micro/go-micro"
-	"golang.org/x/net/context"
 )
 
-type Greeter struct{}
+// type Greeter struct{}
 
-func (g *Greeter) Hello(ctx context.Context, req *proto.HelloRequest, res *proto.HelloResponse) error {
-	res.Greeting = "Hello " + req.Name
-	return nil
-}
+// func (g *Greeter) Hello(ctx context.Context, req *proto.HelloRequest, res *proto.HelloResponse) error {
+// 	res.Greeting = "Hello " + req.Name
+// 	return nil
+// }
 
 func runClient(service micro.Service) error {
-	greeter := proto.NewGreeterClient("JamesGreeter", service.Client())
-	rsp, err := greeter.Hello(context.TODO(), &proto.HelloRequest{Name: "JamesDuan"})
+	// greeter := proto.NewGreeterClient("JamesGreeter", service.Client())
+	dbserviceClient := proto.NewDBClient("weiping.srv.dbservice", service.Client())
+	rsp, err := dbserviceClient.GetUserById(context.TODO(), &proto.GetUserRequest{Id: 1})
 	if err != nil {
-		return err
+		log.Println(err)
 	}
-	log.Println(rsp.Greeting)
+	log.Println(rsp)
 	return nil
 }
 
 func main() {
+	db.InitDBConfig()
 	service := micro.NewService(
-		micro.Name("dbservice"),
+		micro.Name("weiping.srv.dbservice"),
 		micro.Version("1.0.1"),
 		micro.Flags(cli.BoolFlag{
 			Name:  "run-client",
@@ -45,7 +50,8 @@ func main() {
 		}),
 	)
 
-	proto.RegisterGreeterHandler(service.Server(), new(Greeter))
+	// proto.RegisterGreeterHandler(service.Server(), new())
+	proto.RegisterDBHandler(service.Server(), new(handler.DBServiceHandler))
 	if err := service.Run(); err != nil {
 		log.Fatal(err)
 	}

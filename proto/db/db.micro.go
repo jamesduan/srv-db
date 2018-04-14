@@ -55,8 +55,6 @@ type DBClient interface {
 	GetUserById(ctx context.Context, in *GetUserRequest, opts ...client.CallOption) (*GetUserResponse, error)
 	UpdateUser(ctx context.Context, in *UpdateUserRequest, opts ...client.CallOption) (*UpdateUserResponse, error)
 	DeleteUser(ctx context.Context, in *DeleteUserRequest, opts ...client.CallOption) (*DeleteUserResponse, error)
-	Stream(ctx context.Context, in *StreamingRequest, opts ...client.CallOption) (DB_StreamClient, error)
-	PingPong(ctx context.Context, opts ...client.CallOption) (DB_PingPongClient, error)
 }
 
 type dBClient struct {
@@ -107,104 +105,12 @@ func (c *dBClient) DeleteUser(ctx context.Context, in *DeleteUserRequest, opts .
 	return out, nil
 }
 
-func (c *dBClient) Stream(ctx context.Context, in *StreamingRequest, opts ...client.CallOption) (DB_StreamClient, error) {
-	req := c.c.NewRequest(c.serviceName, "DB.Stream", &StreamingRequest{})
-	stream, err := c.c.Stream(ctx, req, opts...)
-	if err != nil {
-		return nil, err
-	}
-	if err := stream.Send(in); err != nil {
-		return nil, err
-	}
-	return &dBStreamClient{stream}, nil
-}
-
-type DB_StreamClient interface {
-	SendMsg(interface{}) error
-	RecvMsg(interface{}) error
-	Close() error
-	Recv() (*StreamingResponse, error)
-}
-
-type dBStreamClient struct {
-	stream client.Streamer
-}
-
-func (x *dBStreamClient) Close() error {
-	return x.stream.Close()
-}
-
-func (x *dBStreamClient) SendMsg(m interface{}) error {
-	return x.stream.Send(m)
-}
-
-func (x *dBStreamClient) RecvMsg(m interface{}) error {
-	return x.stream.Recv(m)
-}
-
-func (x *dBStreamClient) Recv() (*StreamingResponse, error) {
-	m := new(StreamingResponse)
-	err := x.stream.Recv(m)
-	if err != nil {
-		return nil, err
-	}
-	return m, nil
-}
-
-func (c *dBClient) PingPong(ctx context.Context, opts ...client.CallOption) (DB_PingPongClient, error) {
-	req := c.c.NewRequest(c.serviceName, "DB.PingPong", &Ping{})
-	stream, err := c.c.Stream(ctx, req, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return &dBPingPongClient{stream}, nil
-}
-
-type DB_PingPongClient interface {
-	SendMsg(interface{}) error
-	RecvMsg(interface{}) error
-	Close() error
-	Send(*Ping) error
-	Recv() (*Pong, error)
-}
-
-type dBPingPongClient struct {
-	stream client.Streamer
-}
-
-func (x *dBPingPongClient) Close() error {
-	return x.stream.Close()
-}
-
-func (x *dBPingPongClient) SendMsg(m interface{}) error {
-	return x.stream.Send(m)
-}
-
-func (x *dBPingPongClient) RecvMsg(m interface{}) error {
-	return x.stream.Recv(m)
-}
-
-func (x *dBPingPongClient) Send(m *Ping) error {
-	return x.stream.Send(m)
-}
-
-func (x *dBPingPongClient) Recv() (*Pong, error) {
-	m := new(Pong)
-	err := x.stream.Recv(m)
-	if err != nil {
-		return nil, err
-	}
-	return m, nil
-}
-
 // Server API for DB service
 
 type DBHandler interface {
 	GetUserById(context.Context, *GetUserRequest, *GetUserResponse) error
 	UpdateUser(context.Context, *UpdateUserRequest, *UpdateUserResponse) error
 	DeleteUser(context.Context, *DeleteUserRequest, *DeleteUserResponse) error
-	Stream(context.Context, *StreamingRequest, DB_StreamStream) error
-	PingPong(context.Context, DB_PingPongStream) error
 }
 
 func RegisterDBHandler(s server.Server, hdlr DBHandler, opts ...server.HandlerOption) {
@@ -225,79 +131,4 @@ func (h *DB) UpdateUser(ctx context.Context, in *UpdateUserRequest, out *UpdateU
 
 func (h *DB) DeleteUser(ctx context.Context, in *DeleteUserRequest, out *DeleteUserResponse) error {
 	return h.DBHandler.DeleteUser(ctx, in, out)
-}
-
-func (h *DB) Stream(ctx context.Context, stream server.Streamer) error {
-	m := new(StreamingRequest)
-	if err := stream.Recv(m); err != nil {
-		return err
-	}
-	return h.DBHandler.Stream(ctx, m, &dBStreamStream{stream})
-}
-
-type DB_StreamStream interface {
-	SendMsg(interface{}) error
-	RecvMsg(interface{}) error
-	Close() error
-	Send(*StreamingResponse) error
-}
-
-type dBStreamStream struct {
-	stream server.Streamer
-}
-
-func (x *dBStreamStream) Close() error {
-	return x.stream.Close()
-}
-
-func (x *dBStreamStream) SendMsg(m interface{}) error {
-	return x.stream.Send(m)
-}
-
-func (x *dBStreamStream) RecvMsg(m interface{}) error {
-	return x.stream.Recv(m)
-}
-
-func (x *dBStreamStream) Send(m *StreamingResponse) error {
-	return x.stream.Send(m)
-}
-
-func (h *DB) PingPong(ctx context.Context, stream server.Streamer) error {
-	return h.DBHandler.PingPong(ctx, &dBPingPongStream{stream})
-}
-
-type DB_PingPongStream interface {
-	SendMsg(interface{}) error
-	RecvMsg(interface{}) error
-	Close() error
-	Send(*Pong) error
-	Recv() (*Ping, error)
-}
-
-type dBPingPongStream struct {
-	stream server.Streamer
-}
-
-func (x *dBPingPongStream) Close() error {
-	return x.stream.Close()
-}
-
-func (x *dBPingPongStream) SendMsg(m interface{}) error {
-	return x.stream.Send(m)
-}
-
-func (x *dBPingPongStream) RecvMsg(m interface{}) error {
-	return x.stream.Recv(m)
-}
-
-func (x *dBPingPongStream) Send(m *Pong) error {
-	return x.stream.Send(m)
-}
-
-func (x *dBPingPongStream) Recv() (*Ping, error) {
-	m := new(Ping)
-	if err := x.stream.Recv(m); err != nil {
-		return nil, err
-	}
-	return m, nil
 }

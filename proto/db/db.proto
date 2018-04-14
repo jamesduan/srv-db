@@ -6,8 +6,6 @@ service DB {
 	rpc GetUserById(GetUserRequest) returns (GetUserResponse) {}
 	rpc UpdateUser(UpdateUserRequest) returns (UpdateUserResponse) {}
 	rpc DeleteUser(DeleteUserRequest) returns (DeleteUserResponse) {}
-	rpc Stream(StreamingRequest) returns (stream StreamingResponse) {}
-	rpc PingPong(stream Ping) returns (stream Pong) {}
 }
 
 message Message {
@@ -24,7 +22,7 @@ message DeleteUserResponse {
 }
 
 message GetUserRequest {
-	string id = 1;
+	int64 id = 1;
 }
 
 message GetUserResponse {
