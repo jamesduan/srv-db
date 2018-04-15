@@ -14,6 +14,8 @@ It has these top-level messages:
 	GetUserRequest
 	GetUserResponse
 	UpdateUserRequest
+	CreateUserRequest
+	CreateUserResponse
 	UpdateUserResponse
 	Response
 	StreamingRequest
@@ -54,6 +56,7 @@ var _ server.Option
 type DBClient interface {
 	GetUserById(ctx context.Context, in *GetUserRequest, opts ...client.CallOption) (*GetUserResponse, error)
 	UpdateUser(ctx context.Context, in *UpdateUserRequest, opts ...client.CallOption) (*UpdateUserResponse, error)
+	CreateUser(ctx context.Context, in *CreateUserRequest, opts ...client.CallOption) (*CreateUserResponse, error)
 	DeleteUser(ctx context.Context, in *DeleteUserRequest, opts ...client.CallOption) (*DeleteUserResponse, error)
 }
 
@@ -95,6 +98,16 @@ func (c *dBClient) UpdateUser(ctx context.Context, in *UpdateUserRequest, opts .
 	return out, nil
 }
 
+func (c *dBClient) CreateUser(ctx context.Context, in *CreateUserRequest, opts ...client.CallOption) (*CreateUserResponse, error) {
+	req := c.c.NewRequest(c.serviceName, "DB.CreateUser", in)
+	out := new(CreateUserResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *dBClient) DeleteUser(ctx context.Context, in *DeleteUserRequest, opts ...client.CallOption) (*DeleteUserResponse, error) {
 	req := c.c.NewRequest(c.serviceName, "DB.DeleteUser", in)
 	out := new(DeleteUserResponse)
@@ -110,6 +123,7 @@ func (c *dBClient) DeleteUser(ctx context.Context, in *DeleteUserRequest, opts .
 type DBHandler interface {
 	GetUserById(context.Context, *GetUserRequest, *GetUserResponse) error
 	UpdateUser(context.Context, *UpdateUserRequest, *UpdateUserResponse) error
+	CreateUser(context.Context, *CreateUserRequest, *CreateUserResponse) error
 	DeleteUser(context.Context, *DeleteUserRequest, *DeleteUserResponse) error
 }
 
@@ -127,6 +141,10 @@ func (h *DB) GetUserById(ctx context.Context, in *GetUserRequest, out *GetUserRe
 
 func (h *DB) UpdateUser(ctx context.Context, in *UpdateUserRequest, out *UpdateUserResponse) error {
 	return h.DBHandler.UpdateUser(ctx, in, out)
+}
+
+func (h *DB) CreateUser(ctx context.Context, in *CreateUserRequest, out *CreateUserResponse) error {
+	return h.DBHandler.CreateUser(ctx, in, out)
 }
 
 func (h *DB) DeleteUser(ctx context.Context, in *DeleteUserRequest, out *DeleteUserResponse) error {

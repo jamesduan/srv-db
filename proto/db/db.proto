@@ -5,6 +5,7 @@ package go.micro.srv.db;
 service DB {
 	rpc GetUserById(GetUserRequest) returns (GetUserResponse) {}
 	rpc UpdateUser(UpdateUserRequest) returns (UpdateUserResponse) {}
+	rpc CreateUser(CreateUserRequest) returns (CreateUserResponse) {}
 	rpc DeleteUser(DeleteUserRequest) returns (DeleteUserResponse) {}
 }
 
@@ -26,14 +27,6 @@ message GetUserRequest {
 }
 
 message GetUserResponse {
-	int64 id = 1;
-	string name = 2;
-	string sex = 3;
-	string address = 4;
-	string email = 5;
-	string portrait_url = 6;
-	int32 create_time = 7;
-	int32 update_time = 8;
 	message Address {
 		int64 id = 1;
 		string shortname = 2;
@@ -44,9 +37,37 @@ message GetUserResponse {
 		string phone_number =2;
 		string shortname = 3;
 	}
+	int64 id = 1;
+	string name = 2;
+	string sex = 3;
+	string email = 4;
+	string portrait_url = 5;
+	string create_time = 6;
+	string update_time = 7;
+	repeated Address address = 8;
+	repeated MobilePhone mobile = 9;
 }
 
 message UpdateUserRequest {
+	int64 id = 1;
+	string name = 2;
+	string sex = 3;
+	string email = 4;
+	string portrait_url = 5;
+	string create_time = 6;
+	string update_time = 7;
+}
+
+message CreateUserRequest {
+	string name = 1;
+	string sex = 2;
+	string email = 3;
+	string portrait_url = 4;
+	string create_time = 5;
+	string update_time = 6;
+}
+
+message CreateUserResponse {
 	int64 id = 1;
 }
 
@@ -54,11 +75,10 @@ message UpdateUserResponse {
 	int64 id = 1;
 	string name = 2;
 	string sex = 3;
-	string address = 4;
-	string email = 5;
-	string portrait_url = 6;
-	int32 create_time = 7;
-	int32 update_time = 8;
+	string email = 4;
+	string portrait_url = 5;
+	string create_time = 6;
+	string update_time = 7;
 }
 
 message Response {

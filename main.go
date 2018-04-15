@@ -53,6 +53,7 @@ func main() {
 	// proto.RegisterGreeterHandler(service.Server(), new())
 	proto.RegisterDBHandler(service.Server(), new(handler.DBServiceHandler))
 	if err := service.Run(); err != nil {
+		db.DB.Close()
 		log.Fatal(err)
 	}
 }
