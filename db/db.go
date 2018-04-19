@@ -3,6 +3,7 @@ package db
 import (
 	"bytes"
 	"database/sql"
+	"fmt"
 	"log"
 	"strconv"
 
@@ -21,8 +22,11 @@ type DatabaseConfig struct {
 	DBName   string `json:"dbname"`
 }
 
-func readDBConnString(dbconfig *DatabaseConfig) string {
+func readDBConnString(dbconfig *DatabaseConfig, conn *string) error {
 	var buffer bytes.Buffer
+	if dbconfig.User == "" || dbconfig.Port == 0 || dbconfig.DBName == "" || dbconfig.Host == "" || dbconfig.Password == "" {
+		return fmt.Errorf("read db config: dbconfig is nil")
+	}
 	buffer.WriteString(dbconfig.User)
 	buffer.WriteString(":")
 	buffer.WriteString(dbconfig.Password)
@@ -33,12 +37,14 @@ func readDBConnString(dbconfig *DatabaseConfig) string {
 	buffer.WriteString(")/")
 	buffer.WriteString(dbconfig.DBName)
 	buffer.WriteString("?loc=Local&parseTime=true")
-	return buffer.String()
+	*conn = buffer.String()
+	return nil
 }
 
 func InitDBConfig() {
 	var err error
 	var dbconfig DatabaseConfig
+	var connectString string
 
 	consulSource := consul.NewSource(
 		// optionally specify consul address; default to localhost:8500
@@ -51,7 +57,9 @@ func InitDBConfig() {
 	conf.Load(consulSource)
 	conf.Get("micro", "config", "database").Scan(&dbconfig)
 	// log.Println(dbconfig)
-	DB, err = sql.Open("mysql", readDBConnString(&dbconfig))
+	readDBConnString(&dbconfig, &connectString)
+	log.Println(connectString)
+	DB, err = sql.Open("mysql", connectString)
 	if err != nil {
 		log.Fatal("open db fail", err)
 	}

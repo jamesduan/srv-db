@@ -32,7 +32,6 @@ func runClient(service micro.Service) error {
 }
 
 func main() {
-	db.InitDBConfig()
 	service := micro.NewService(
 		micro.Name("weiping.srv.dbservice"),
 		micro.Version("1.0.1"),
@@ -49,6 +48,7 @@ func main() {
 			}
 		}),
 	)
+	db.InitDBConfig()
 
 	// proto.RegisterGreeterHandler(service.Server(), new())
 	proto.RegisterDBHandler(service.Server(), new(handler.DBServiceHandler))
