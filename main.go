@@ -4,24 +4,15 @@ import (
 	"context"
 	"log"
 	"os"
+	"srv-db/g"
 	"srv-db/handler"
 	proto "srv-db/proto/db"
-
-	"srv-db/db"
 
 	"github.com/micro/cli"
 	"github.com/micro/go-micro"
 )
 
-// type Greeter struct{}
-
-// func (g *Greeter) Hello(ctx context.Context, req *proto.HelloRequest, res *proto.HelloResponse) error {
-// 	res.Greeting = "Hello " + req.Name
-// 	return nil
-// }
-
 func runClient(service micro.Service) error {
-	// greeter := proto.NewGreeterClient("JamesGreeter", service.Client())
 	dbserviceClient := proto.NewDBClient("weiping.srv.dbservice", service.Client())
 	rsp, err := dbserviceClient.GetUserById(context.TODO(), &proto.GetUserRequest{Id: 1})
 	if err != nil {
@@ -48,12 +39,11 @@ func main() {
 			}
 		}),
 	)
-	db.InitDBConfig()
+	g.InitDBConfig()
 
-	// proto.RegisterGreeterHandler(service.Server(), new())
 	proto.RegisterDBHandler(service.Server(), new(handler.DBServiceHandler))
 	if err := service.Run(); err != nil {
-		db.DB.Close()
+		g.DB.Close()
 		log.Fatal(err)
 	}
 }

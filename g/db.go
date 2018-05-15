@@ -1,4 +1,4 @@
-package db
+package g
 
 import (
 	"bytes"
@@ -60,10 +60,15 @@ func InitDBConfig() {
 	readDBConnString(&dbconfig, &connectString)
 	log.Println(connectString)
 	DB, err = sql.Open("mysql", connectString)
+	// log.Println(DB, err)
 	if err != nil {
 		log.Fatal("open db fail", err)
 	}
 	DB.SetMaxOpenConns(20)
 	DB.SetMaxIdleConns(15)
+	err = DB.Ping()
+	if err != nil {
+		log.Fatalln("ping db fail:", err)
+	}
 	log.Println("Initialized Db Configuration.")
 }

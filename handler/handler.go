@@ -6,7 +6,7 @@ import (
 
 	// example "db/proto/example"
 	"log"
-	"srv-db/db"
+	"srv-db/g"
 	proto "srv-db/proto/db"
 )
 
@@ -16,7 +16,7 @@ func (d *DBServiceHandler) GetUserById(ctx context.Context, req *proto.GetUserRe
 	log.Println("getUserById")
 	sql := fmt.Sprintf("select * from user where id=%d", req.Id)
 	// log.Println(sql)
-	rows, err := db.DB.Query(sql)
+	rows, err := g.DB.Query(sql)
 	// log.Println(rows)
 	for rows.Next() {
 		var (
@@ -52,7 +52,7 @@ func (d *DBServiceHandler) GetUserById(ctx context.Context, req *proto.GetUserRe
 func (d *DBServiceHandler) DeleteUser(ctx context.Context, req *proto.DeleteUserRequest, rsp *proto.DeleteUserResponse) error {
 	log.Println("delete user")
 	sql := fmt.Sprintf("delete from user where id=%d", req.Id)
-	_, err := db.DB.Exec(sql)
+	_, err := g.DB.Exec(sql)
 	if err != nil {
 		return err
 	}
@@ -73,7 +73,7 @@ func (d *DBServiceHandler) UpdateUser(ctx context.Context, req *proto.UpdateUser
 		req.Id,
 	)
 	log.Println(sql)
-	result, err := db.DB.Exec(sql)
+	result, err := g.DB.Exec(sql)
 	log.Println(result.RowsAffected())
 	if err != nil {
 		log.Println(err)
@@ -94,7 +94,7 @@ func (d *DBServiceHandler) CreateUser(ctx context.Context, req *proto.CreateUser
 		req.CreateTime,
 		req.UpdateTime,
 	)
-	dbrsp, err := db.DB.Exec(sql)
+	dbrsp, err := g.DB.Exec(sql)
 	if err != nil {
 		log.Panicln(err)
 		return err
