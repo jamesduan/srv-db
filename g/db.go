@@ -7,7 +7,11 @@ import (
 	"log"
 	"strconv"
 
-	_ "github.com/go-sql-driver/mysql"
+	// _ "github.com/go-sql-driver/mysql"
+	"srv-db/model"
+
+	"github.com/jinzhu/gorm"
+	_ "github.com/jinzhu/gorm/dialects/mysql"
 	config "github.com/micro/go-config"
 	"github.com/micro/go-config/source/consul"
 )
@@ -36,7 +40,7 @@ func readDBConnString(dbconfig *DatabaseConfig, conn *string) error {
 	buffer.WriteString(strconv.Itoa(dbconfig.Port))
 	buffer.WriteString(")/")
 	buffer.WriteString(dbconfig.DBName)
-	buffer.WriteString("?loc=Local&parseTime=true")
+	buffer.WriteString("?loc=Local&parseTime=true&charset=utf8")
 	*conn = buffer.String()
 	return nil
 }
@@ -48,7 +52,7 @@ func InitDBConfig() {
 
 	consulSource := consul.NewSource(
 		// optionally specify consul address; default to localhost:8500
-		consul.WithAddress("127.0.0.1:8500"),
+		consul.WithAddress(consulAdress),
 		// optionally specify prefix; defaults to /micro/config
 	)
 	conf := config.NewConfig()
@@ -59,16 +63,14 @@ func InitDBConfig() {
 	// log.Println(dbconfig)
 	readDBConnString(&dbconfig, &connectString)
 	log.Println(connectString)
-	DB, err = sql.Open("mysql", connectString)
+	// DB, err = sql.Open("mysql", connectString)
+	DB, err := gorm.Open("mysql", connectString)
 	// log.Println(DB, err)
 	if err != nil {
 		log.Fatal("open db fail", err)
 	}
-	DB.SetMaxOpenConns(20)
-	DB.SetMaxIdleConns(15)
-	err = DB.Ping()
-	if err != nil {
-		log.Fatalln("ping db fail:", err)
-	}
+	DB.DB().SetMaxOpenConns(100)
+	DB.DB().SetMaxIdleConns(10)
 	log.Println("Initialized Db Configuration.")
+	DB.Set("gorm:table_options", "ENGINE=InnoDB").AutoMigrate(&model.Users{}, &model.AliPay{}, &model.CreditCard{}, &model.Email{}, &model.HomeAdress{}, &model.ShoppingAdress{}, &model.Wechat{})
 }
