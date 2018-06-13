@@ -1,26 +1,17 @@
 package main
 
 import (
-	"context"
 	"log"
 	"os"
 	"srv-db/g"
 	"srv-db/handler"
 	proto "srv-db/proto/db"
 
+	localCli "srv-db/cli"
+
 	"github.com/micro/cli"
 	"github.com/micro/go-micro"
 )
-
-func runClient(service micro.Service) error {
-	dbserviceClient := proto.NewDBClient("weiping.srv.dbservice", service.Client())
-	rsp, err := dbserviceClient.GetUserById(context.TODO(), &proto.GetUserRequest{Id: 1})
-	if err != nil {
-		log.Println(err)
-	}
-	log.Println(rsp)
-	return nil
-}
 
 func main() {
 	service := micro.NewService(
@@ -34,7 +25,7 @@ func main() {
 	service.Init(
 		micro.Action(func(c *cli.Context) {
 			if c.Bool("run-client") {
-				runClient(service)
+				localCli.RunClient(service)
 				os.Exit(0)
 			}
 		}),

@@ -2,7 +2,6 @@ package g
 
 import (
 	"bytes"
-	"database/sql"
 	"fmt"
 	"log"
 	"strconv"
@@ -16,7 +15,7 @@ import (
 	"github.com/micro/go-config/source/consul"
 )
 
-var DB *sql.DB
+var DB *gorm.DB
 
 type DatabaseConfig struct {
 	Host     string `json:"dbhost"`
@@ -72,5 +71,11 @@ func InitDBConfig() {
 	DB.DB().SetMaxOpenConns(100)
 	DB.DB().SetMaxIdleConns(10)
 	log.Println("Initialized Db Configuration.")
-	DB.Set("gorm:table_options", "ENGINE=InnoDB").AutoMigrate(&model.Users{}, &model.AliPay{}, &model.CreditCard{}, &model.Email{}, &model.HomeAdress{}, &model.ShoppingAdress{}, &model.Wechat{})
+	DB.Set("gorm:table_options", "ENGINE=InnoDB").AutoMigrate(&model.Users{}, &model.AliPay{}, &model.CreditCard{}, &model.Email{}, &model.HomeAddress{}, &model.ShoppingAdress{}, &model.Wechat{}, &model.Product{})
+	// DB.Create(&model.Product{Code: "L1212", Price: 1000})
+	// adresses := make([]model.HomeAddress, 0)
+	// homeAddress := model.HomeAddress{Address: "Shanghai", Post: "djkjflsdjflsdjlf"}
+	// adresses = append(adresses, homeAddress)
+
+	// DB.Create(&model.Users{Name: "jamesduan", Sex: "男", Number: "12345667", HomeAddresses: adresses, BirthDay: time.Unix(1469579899, 0)})
 }

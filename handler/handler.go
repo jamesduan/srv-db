@@ -6,7 +6,6 @@ import (
 
 	// example "db/proto/example"
 	"log"
-	"srv-db/g"
 	proto "srv-db/proto/db"
 )
 
@@ -15,91 +14,91 @@ type DBServiceHandler struct{}
 func (d *DBServiceHandler) GetUserById(ctx context.Context, req *proto.GetUserRequest, rsp *proto.GetUserResponse) error {
 	log.Println("getUserById")
 	sql := fmt.Sprintf("select * from user where id=%d", req.Id)
-	// log.Println(sql)
-	rows, err := g.DB.Query(sql)
-	// log.Println(rows)
-	for rows.Next() {
-		var (
-			id          int64
-			name        string
-			email       string
-			sex         string
-			portraitURL string
-			createTime  string
-			updateTime  string
-		)
-		err := rows.Scan(&id, &name, &email, &sex, &portraitURL, &createTime, &updateTime)
-		if err != nil {
-			log.Println(err)
-		}
-		rsp.Id = id
-		rsp.Name = name
-		rsp.Email = email
-		rsp.Sex = sex
-		rsp.PortraitUrl = portraitURL
-		rsp.CreateTime = createTime
-		rsp.UpdateTime = updateTime
-		// log.Println(id, name, email, sex, portraitURL, createTime, updateTime)
-	}
-	if err != nil {
-		log.Println("exec", sql, "fail", err)
-		return err
-	}
-	defer rows.Close()
+	log.Println(sql)
+	// rows, err := g.DB.Query(sql)
+	// // log.Println(rows)
+	// for rows.Next() {
+	// 	var (
+	// 		id          int64
+	// 		name        string
+	// 		email       string
+	// 		sex         string
+	// 		portraitURL string
+	// 		createTime  string
+	// 		updateTime  string
+	// 	)
+	// 	err := rows.Scan(&id, &name, &email, &sex, &portraitURL, &createTime, &updateTime)
+	// 	if err != nil {
+	// 		log.Println(err)
+	// 	}
+	// 	rsp.Id = id
+	// 	rsp.Name = name
+	// 	rsp.Email = email
+	// 	rsp.Sex = sex
+	// 	rsp.PortraitUrl = portraitURL
+	// 	rsp.CreateTime = createTime
+	// 	rsp.UpdateTime = updateTime
+	// 	// log.Println(id, name, email, sex, portraitURL, createTime, updateTime)
+	// }
+	// if err != nil {
+	// 	log.Println("exec", sql, "fail", err)
+	// 	return err
+	// }
+	// defer rows.Close()
 	return nil
 }
 
 func (d *DBServiceHandler) DeleteUser(ctx context.Context, req *proto.DeleteUserRequest, rsp *proto.DeleteUserResponse) error {
 	log.Println("delete user")
-	sql := fmt.Sprintf("delete from user where id=%d", req.Id)
-	_, err := g.DB.Exec(sql)
-	if err != nil {
-		return err
-	}
+	// sql := fmt.Sprintf("delete from user where id=%d", req.Id)
+	// _, err := g.DB.Exec(sql)
+	// if err != nil {
+	// 	return err
+	// }
 	return nil
 }
 
 func (d *DBServiceHandler) UpdateUser(ctx context.Context, req *proto.UpdateUserRequest, rsp *proto.UpdateUserResponse) error {
 	log.Println("update user")
 	log.Println(req)
-	sql := fmt.Sprintf(
-		"update user set name='%s', email='%s', sex='%s', portrait_url='%s', create_time='%s', update_time='%s' where id=%d",
-		req.Name,
-		req.Email,
-		req.Sex,
-		req.PortraitUrl,
-		req.CreateTime,
-		req.UpdateTime,
-		req.Id,
-	)
-	log.Println(sql)
-	result, err := g.DB.Exec(sql)
-	log.Println(result.RowsAffected())
-	if err != nil {
-		log.Println(err)
-		return err
-	}
+	// sql := fmt.Sprintf(
+	// 	"update user set name='%s', email='%s', sex='%s', portrait_url='%s', create_time='%s', update_time='%s' where id=%d",
+	// 	req.Name,
+	// 	req.Email,
+	// 	req.Sex,
+	// 	req.PortraitUrl,
+	// 	req.CreateTime,
+	// 	req.UpdateTime,
+	// 	req.Id,
+	// )
+	// log.Println(sql)
+	// result, err := g.DB.Exec(sql)
+	// log.Println(result.RowsAffected())
+	// if err != nil {
+	// 	log.Println(err)
+	// 	return err
+	// }
 	// log.Println(result.LastInsertId())
 	return nil
 }
 
 func (d *DBServiceHandler) CreateUser(ctx context.Context, req *proto.CreateUserRequest, rsp *proto.CreateUserResponse) error {
 	log.Println("Create User")
-	sql := fmt.Sprintf(
-		"insert into user(name, email, sex, portrait_url, create_time, update_time) values ('%s', '%s', '%s', '%s', '%s', '%s')",
-		req.Name,
-		req.Email,
-		req.Sex,
-		req.PortraitUrl,
-		req.CreateTime,
-		req.UpdateTime,
-	)
-	dbrsp, err := g.DB.Exec(sql)
-	if err != nil {
-		log.Panicln(err)
-		return err
-	}
-	log.Println(dbrsp.RowsAffected())
+	// sql := fmt.Sprintf(
+	// 	"insert into user(name, email, sex, portrait_url, create_time, update_time) values ('%s', '%s', '%s', '%s', '%s', '%s')",
+	// 	req.Name,
+	// 	req.Email,
+	// 	req.Sex,
+	// 	req.PortraitUrl,
+	// 	req.CreateTime,
+	// 	req.UpdateTime,
+	// )
+	// dbrsp, err := g.DB.Exec(sql)
+	// if err != nil {
+	// 	log.Panicln(err)
+	// 	return err
+	// }
+	// log.Println(dbrsp.RowsAffected())
 	return nil
 }
 
