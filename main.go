@@ -15,7 +15,7 @@ import (
 
 func main() {
 	service := micro.NewService(
-		micro.Name("weiping.srv.dbservice"),
+		micro.Name("cotapi"),
 		micro.Version("1.0.1"),
 		micro.Flags(cli.BoolFlag{
 			Name:  "run-client",
